@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -11,7 +12,6 @@
 
   <title>QR Attendance</title>
 
-  <!-- QR scanner library -->
   <script src="https://unpkg.com/html5-qrcode"></script>
 
   <style>
@@ -23,59 +23,40 @@
     body {
       margin: 0;
       padding: 20px;
-
       font-family: Arial, sans-serif;
-
       background: #f5f5f5;
     }
 
     .container {
       width: 100%;
       max-width: 500px;
-
       margin: 0 auto;
-
       background: white;
-
       padding: 20px;
-
       border-radius: 14px;
-
-      box-shadow:
-        0 2px 10px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
     }
 
     h1 {
       margin-top: 0;
-
       text-align: center;
-
       font-size: 24px;
     }
 
     #reader {
       width: 100%;
-
       margin: 20px auto;
     }
 
     #result {
       margin-top: 15px;
-
       padding: 14px;
-
       border-radius: 10px;
-
       text-align: center;
-
       font-weight: bold;
-
       min-height: 48px;
-
       display: flex;
-
       align-items: center;
-
       justify-content: center;
     }
 
@@ -101,11 +82,8 @@
 
     .status {
       margin-top: 15px;
-
       font-size: 13px;
-
       color: #666;
-
       text-align: center;
     }
 
@@ -147,11 +125,6 @@
      * ==========================================
      * GET BACKEND URL
      * ==========================================
-     *
-     * Apps Script sẽ mở trang này với:
-     *
-     * ?backend=https://script.google.com/...
-     *
      */
 
     const params =
@@ -214,7 +187,7 @@
 
     /*
      * ==========================================
-     * CHECK BACKEND
+     * CHECK BACKEND URL
      * ==========================================
      */
 
@@ -243,9 +216,6 @@
       decodedText
     ) {
 
-      // Prevent multiple scans
-      // at the same time
-
       if (processing) {
         return;
       }
@@ -266,7 +236,7 @@
 
 
       /*
-       * Create a unique callback name
+       * Create unique callback
        */
 
       const callbackName =
@@ -275,7 +245,7 @@
 
 
       /*
-       * Create callback function
+       * Create JSONP callback
        */
 
       window[callbackName] =
@@ -289,6 +259,7 @@
           delete window[
             callbackName
           ];
+
         };
 
 
@@ -308,373 +279,5 @@
 
         "&callback=" +
         encodeURIComponent(
-          callbackName
-        );
-
-
-      /*
-       * Use JSONP
-       *
-       * This allows GitHub Pages
-       * to communicate with
-       * Apps Script without CORS problems.
-       */
-
-      const script =
-        document.createElement(
-          "script"
-        );
-
-
-      script.src =
-        url;
-
-
-      /*
-       * Backend connection error
-       */
-
-      script.onerror =
-        function() {
-
-          handleResponse({
-
-            success: false,
-
-            type: "error",
-
-            message:
-              "Không kết nối được với Apps Script."
-
-          });
-
-
-          delete window[
-            callbackName
-          ];
-        };
-
-
-      document.body.appendChild(
-        script
-      );
-
-
-      /*
-       * Timeout protection
-       */
-
-      setTimeout(
-        function() {
-
-          if (processing) {
-
-            handleResponse({
-
-              success: false,
-
-              type: "error",
-
-              message:
-                "Backend phản hồi quá lâu."
-
-            });
-
-
-            delete window[
-              callbackName
-            ];
-          }
-
-        },
-        10000
-      );
-
-    }
-
-
-    /*
-     * ==========================================
-     * HANDLE BACKEND RESPONSE
-     * ==========================================
-     */
-
-    function handleResponse(
-      response
-    ) {
-
-      if (!response) {
-
-        showResult(
-          "Không nhận được phản hồi.",
-          "error"
-        );
-
-
-        processing =
-          false;
-
-
-        return;
-      }
-
-
-      /*
-       * Student successfully marked present
-       */
-
-      if (
-        response.type ===
-        "present"
-      ) {
-
-        showResult(
-          "✓ " +
-          response.message,
-
-          "success"
-        );
-
-      }
-
-
-      /*
-       * Student scanned again
-       */
-
-      else if (
-        response.type ===
-        "already_present"
-      ) {
-
-        showResult(
-          "✓ " +
-          response.message,
-
-          "warning"
-        );
-
-      }
-
-
-      /*
-       * Student already has
-       * Có phép / Không phép
-       */
-
-      else if (
-        response.type ===
-        "already_marked"
-      ) {
-
-        showResult(
-          "⚠ " +
-          response.message,
-
-          "warning"
-        );
-
-      }
-
-
-      /*
-       * Student does not exist
-       */
-
-      else if (
-        response.type ===
-        "not_found"
-      ) {
-
-        showResult(
-          "✗ " +
-          response.message,
-
-          "error"
-        );
-
-      }
-
-
-      /*
-       * No date column
-       */
-
-      else if (
-        response.type ===
-        "no_date"
-      ) {
-
-        showResult(
-          "⚠ " +
-          response.message,
-
-          "warning"
-        );
-
-      }
-
-
-      /*
-       * Other error
-       */
-
-      else {
-
-        showResult(
-          "⚠ " +
-          (
-            response.message ||
-            "Có lỗi xảy ra."
-          ),
-
-          "error"
-        );
-      }
-
-
-      /*
-       * Show student name
-       */
-
-      if (
-        response.studentName
-      ) {
-
-        setStatus(
-          response.studentName
-        );
-
-      }
-
-
-      /*
-       * Allow another scan
-       * after a short delay
-       */
-
-      setTimeout(
-        function() {
-
-          processing =
-            false;
-
-        },
-        1200
-      );
-
-    }
-
-
-    /*
-     * ==========================================
-     * QR SCAN SUCCESS
-     * ==========================================
-     */
-
-    function onScanSuccess(
-      decodedText
-    ) {
-
-      sendQRCode(
-        decodedText
-      );
-
-    }
-
-
-    /*
-     * ==========================================
-     * QR SCAN FAILURE
-     * ==========================================
-     *
-     * This runs continuously while
-     * the camera is looking for a QR.
-     *
-     * We don't need to display
-     * anything here.
-     */
-
-    function onScanFailure(
-      error
-    ) {
-
-      // Do nothing
-
-    }
-
-
-    /*
-     * ==========================================
-     * START CAMERA
-     * ==========================================
-     */
-
-    function startScanner() {
-
-      if (!backendUrl) {
-        return;
-      }
-
-
-      scanner =
-        new Html5QrcodeScanner(
-
-          "reader",
-
-          {
-
-            fps: 10,
-
-            qrbox: {
-              width: 250,
-              height: 250
-            },
-
-            rememberLastUsedCamera:
-              true,
-
-            supportedScanTypes: [
-
-              Html5QrcodeScanType
-                .SCAN_TYPE_CAMERA
-
-            ]
-
-          },
-
-          false
-
-        );
-
-
-      scanner.render(
-        onScanSuccess,
-        onScanFailure
-      );
-
-
-      setStatus(
-        "Camera ready."
-      );
-
-    }
-
-
-    /*
-     * ==========================================
-     * START
-     * ==========================================
-     */
-
-    if (backendUrl) {
-
-      startScanner();
-
-    }
-
-  </script>
-
-</body>
-
-</html>
+          callback
+```

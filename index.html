@@ -484,20 +484,34 @@ const backendUrl =
 
       scanner.start(
 
-        {
-          facingMode: "environment"
-        },
+  {
+    facingMode: "environment"
+  },
 
-        { fps: 20, qrbox: { width: 300, height: 300 } }
+  {
+    fps: 20,
+    qrbox: {
+      width: 300,
+      height: 300
+    }
+  },
 
-        function(decodedText) {
+  function(decodedText) {
 
-          onScanSuccess(
-            decodedText
-          );
+    onScanSuccess(
+      decodedText
+    );
 
-        },
+  },
 
+  function(errorMessage) {
+
+    // Không cần làm gì
+    // khi camera chưa nhận được QR
+
+  }
+
+);
         function(errorMessage) {
 
           /*

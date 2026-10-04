@@ -482,19 +482,58 @@ const backendUrl =
        * Start camera
        */
 
-      scanner.start(
+      try {
 
-  {
-    facingMode: "environment"
-  },
+  setStatus("Đang khởi động camera...");
 
-  {
-    fps: 20,
-    qrbox: {
-      width: 300,
-      height: 300
+  async await scanner.start(
+
+    {
+      facingMode: "environment"
+    },
+
+    {
+      fps: 20,
+      qrbox: {
+        width: 300,
+        height: 300
+      }
+    },
+
+    function(decodedText) {
+
+      onScanSuccess(decodedText);
+
+    },
+
+    function(errorMessage) {
+
+      // Camera vẫn đang chạy,
+      // chưa nhận được QR thì bỏ qua.
+
     }
-  },
+
+  );
+
+  setStatus("Camera đã sẵn sàng");
+
+}
+catch (error) {
+
+  console.error("Camera error:", error);
+
+  setStatus(
+    "LỖI CAMERA: " +
+    (error.message || error)
+  );
+
+  showResult(
+    "Lỗi camera: " +
+    (error.message || error),
+    "error"
+  );
+
+}
 
   function(decodedText) {
 

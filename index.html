@@ -472,10 +472,26 @@ const backendUrl =
    * Create QR scanner
    */
 
-  scanner =
-    new Html5Qrcode(
-      "reader"
-    );
+  setStatus("Đang kiểm tra thư viện camera...");
+
+if (typeof Html5Qrcode === "undefined") {
+
+  showResult(
+    "Không tải được thư viện QR camera.",
+    "error"
+  );
+
+  setStatus(
+    "Html5Qrcode chưa được tải."
+  );
+
+  return;
+}
+
+scanner =
+  new Html5Qrcode(
+    "reader"
+  );
 
 
   /*

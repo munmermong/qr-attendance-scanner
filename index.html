@@ -449,44 +449,45 @@ const backendUrl =
 
     function startScanner() {
 
-      /*
-       * Check backend URL
-       */
+  /*
+   * Check backend URL
+   */
 
-      if (!backendUrl) {
+  if (!backendUrl) {
 
-        showResult(
-          "Thiếu backend URL.",
-          "error"
-        );
+    showResult(
+      "Thiếu backend URL.",
+      "error"
+    );
 
-        setStatus(
-          "Hãy mở scanner từ Google Sheets → QR Attendance → Open QR Scanner."
-        );
+    setStatus(
+      "Thiếu backend URL."
+    );
 
-        return;
-      }
-
-
-      /*
-       * Create QR scanner
-       */
-
-      scanner =
-        new Html5Qrcode(
-          "reader"
-        );
+    return;
+  }
 
 
-      /*
-       * Start camera
-       */
+  /*
+   * Create QR scanner
+   */
 
-      try {
+  scanner =
+    new Html5Qrcode(
+      "reader"
+    );
 
-  setStatus("Đang khởi động camera...");
 
-  async await scanner.start(
+  /*
+   * Start camera
+   */
+
+  setStatus(
+    "Đang khởi động camera..."
+  );
+
+
+  scanner.start(
 
     {
       facingMode: "environment"
@@ -494,6 +495,7 @@ const backendUrl =
 
     {
       fps: 20,
+
       qrbox: {
         width: 300,
         height: 300
@@ -502,39 +504,56 @@ const backendUrl =
 
     function(decodedText) {
 
-      onScanSuccess(decodedText);
+      onScanSuccess(
+        decodedText
+      );
 
     },
 
     function(errorMessage) {
 
-      // Camera vẫn đang chạy,
-      // chưa nhận được QR thì bỏ qua.
+      // Ignore normal scanning errors.
 
     }
 
+  )
+
+  .then(
+    function() {
+
+      showResult(
+        "Camera ready.",
+        "info"
+      );
+
+      setStatus(
+        "Đưa mã QR vào khung camera."
+      );
+
+    }
+  )
+
+  .catch(
+    function(error) {
+
+      console.error(
+        "Camera error:",
+        error
+      );
+
+      showResult(
+        "Không thể mở camera.",
+        "error"
+      );
+
+      setStatus(
+        "Camera error: " +
+        (error.message || error)
+      );
+
+    }
   );
-
-  setStatus("Camera đã sẵn sàng");
-
 }
-catch (error) {
-
-  console.error("Camera error:", error);
-
-  setStatus(
-    "LỖI CAMERA: " +
-    (error.message || error)
-  );
-
-  showResult(
-    "Lỗi camera: " +
-    (error.message || error),
-    "error"
-  );
-
-}
-
   function(decodedText) {
 
     onScanSuccess(

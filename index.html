@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -513,180 +514,182 @@
 
     function startScanner() {
 
-  /*
-   * Check backend
-   */
+      /*
+       * Check backend
+       */
 
-  if (!backendUrl) {
+      if (!backendUrl) {
 
-    showResult(
-      "Thiếu backend URL.",
-      "error"
-    );
+        showResult(
+          "Thiếu backend URL.",
+          "error"
+        );
 
-    setStatus(
-      "Thiếu backend URL."
-    );
+        setStatus(
+          "Thiếu backend URL."
+        );
 
-    return;
-  }
-
-
-  /*
-   * Check QR library
-   */
-
-  setStatus(
-    "Đang kiểm tra thư viện camera..."
-  );
-
-
-  if (
-    typeof Html5Qrcode ===
-    "undefined"
-  ) {
-
-    showResult(
-      "Không tải được thư viện QR camera.",
-      "error"
-    );
-
-    setStatus(
-      "Html5Qrcode chưa được tải."
-    );
-
-    return;
-  }
-
-
-  /*
-   * Create scanner
-   *
-   * Only QR_CODE is needed.
-   * This avoids checking for other barcode types.
-   */
-
-  scanner =
-    new Html5Qrcode(
-      "reader",
-      {
-        formatsToSupport: [
-          Html5QrcodeSupportedFormats.QR_CODE
-        ]
+        return;
       }
-    );
 
 
-  /*
-   * Start rear camera directly
-   *
-   * We don't need getCameras().
-   */
-
-  setStatus(
-    "Đang khởi động camera..."
-  );
-
-
-  scanner.start(
-
-    {
-      facingMode: "environment"
-    },
-
-    {
-      fps: 20,
-
-      qrbox: {
-        width: 300,
-        height: 300
-      },
-
-      aspectRatio: 1.0
-    },
-
-
-    /*
-     * QR FOUND
-     */
-
-    function(decodedText) {
-
-      onScanSuccess(
-        decodedText
-      );
-
-    },
-
-
-    /*
-     * QR NOT FOUND
-     */
-
-    function(errorMessage) {
-
-      // Ignore normal scanning errors.
-
-    }
-
-  )
-
-
-  /*
-   * CAMERA READY
-   */
-
-  .then(
-    function() {
-
-      showResult(
-        "Camera ready.",
-        "info"
-      );
+      /*
+       * Check QR library
+       */
 
       setStatus(
-        "Đưa mã QR vào khung camera."
-      );
-
-    }
-  )
-
-
-  /*
-   * CAMERA ERROR
-   */
-
-  .catch(
-    function(error) {
-
-      console.error(
-        "Camera error:",
-        error
+        "Đang kiểm tra thư viện camera..."
       );
 
 
-      const errorMessage =
-        error &&
-        error.message
-          ? error.message
-          : String(error);
+      if (
+        typeof Html5Qrcode ===
+        "undefined"
+      ) {
+
+        showResult(
+          "Không tải được thư viện QR camera.",
+          "error"
+        );
+
+        setStatus(
+          "Html5Qrcode chưa được tải."
+        );
+
+        return;
+      }
 
 
-      showResult(
-        "Không thể mở camera.",
-        "error"
-      );
+      /*
+       * Create scanner
+       *
+       * Only scan QR codes.
+       */
 
+      scanner =
+        new Html5Qrcode(
+          "reader",
+          {
+            formatsToSupport: [
+              Html5QrcodeSupportedFormats.QR_CODE
+            ]
+          }
+        );
+
+
+      /*
+       * Start rear camera
+       *
+       * facingMode works on both
+       * iPhone and Android.
+       */
 
       setStatus(
-        "Camera error: " +
-        errorMessage
+        "Đang khởi động camera..."
+      );
+
+
+      scanner.start(
+
+        {
+          facingMode: "environment"
+        },
+
+        /*
+         * Scan frequently enough
+         * without putting excessive
+         * load on mobile CPUs.
+         */
+
+        {
+          fps: 20,
+
+          qrbox: {
+            width: 280,
+            height: 280
+          },
+
+          aspectRatio: 1.0
+        },
+
+        /*
+         * QR FOUND
+         */
+
+        function(decodedText) {
+
+          onScanSuccess(
+            decodedText
+          );
+
+        },
+
+        /*
+         * QR NOT FOUND
+         */
+
+        function(errorMessage) {
+
+          // Ignore normal scanning errors.
+
+        }
+
+      )
+
+      /*
+       * CAMERA READY
+       */
+
+      .then(
+        function() {
+
+          showResult(
+            "Camera ready.",
+            "info"
+          );
+
+          setStatus(
+            "Đưa mã QR vào khung camera."
+          );
+
+        }
+      )
+
+      /*
+       * CAMERA ERROR
+       */
+
+      .catch(
+        function(error) {
+
+          console.error(
+            "Camera error:",
+            error
+          );
+
+
+          const errorMessage =
+            error &&
+            error.message
+              ? error.message
+              : String(error);
+
+
+          showResult(
+            "Không thể mở camera.",
+            "error"
+          );
+
+
+          setStatus(
+            "Camera error: " +
+            errorMessage
+          );
+
+        }
       );
 
     }
-  );
-
-}
 
 
     /*
@@ -702,3 +705,4 @@
 </body>
 
 </html>
+
